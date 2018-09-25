@@ -1,9 +1,9 @@
 {
-	"name": "d-forth",
+	"name": "dxm",
 	"authors": [
 		"karita"
 	],
-	"description": "A minimal D application.",
+	"description": "D library for executable memory",
 	"copyright": "Copyright © 2018, karita",
 	"license": "BSL-1.0"
 }

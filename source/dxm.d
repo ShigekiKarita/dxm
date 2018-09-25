@@ -1,4 +1,6 @@
-// @nogc:
+module dxm;
+
+nothrow @nogc:
 // extern (C):
 /*
   https://defuse.ca/online-x86-assembler.htm
@@ -10,6 +12,7 @@ import core.stdc.string;
 
 /// https://linuxjm.osdn.jp/html/LDP_man-pages/man2/mmap.2.html
 struct ExecutableMemory {
+    nothrow @nogc:
     import core.sys.posix.sys.mman;
 
     private ubyte* _ptr; // disable assign
@@ -25,19 +28,12 @@ struct ExecutableMemory {
         this.length = len;
     }
 
-    this(ubyte[] bytes) {
+    this(ubyte[] bytes...) {
         this(bytes.length);
         this.ptr[0..bytes.length] = bytes;
     }
 
-    this(size_t N)(uint[N] bytes...) {
-        this(bytes.length);
-        static foreach (n; 0 .. N) {
-            this.ptr[n] = cast(ubyte) bytes[n];
-        }
-    }
-
-    auto ptr() {
+    auto ptr() pure {
         return this._ptr;
     }
 
@@ -52,7 +48,7 @@ ulong test_f(ulong a, ulong b) {
 }
 
 /// test add function
-unittest {
+@nogc nothrow unittest {
     // https://docs.oracle.com/cd/E19253-01/819-0389/fcowb/index.html
     // https://ja.wikipedia.org/wiki/%E5%91%BC%E5%87%BA%E8%A6%8F%E7%B4%84#cdecl
     auto mem = ExecutableMemory(
@@ -60,10 +56,6 @@ unittest {
         0x48, 0x01, 0xF0, // add rax, rsi
         0xC3              // ret
         );
-    auto fun = cast(ulong function(ulong, ulong)) mem.ptr;
+    auto fun = cast(ulong function(ulong, ulong) nothrow) mem.ptr;
     assert(fun(11, 31) == 42);
-}
-
-void main() {
-    
 }
